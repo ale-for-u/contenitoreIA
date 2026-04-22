@@ -2,11 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>I miei link online</title>
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <title>I miei link</title>
 
   <style>
     body {
@@ -29,94 +25,47 @@
       margin: 30px auto;
     }
 
-    input {
-      padding: 10px;
-      margin: 10px;
-      border: none;
-      border-radius: 8px;
-      width: 70%;
-    }
-
-    button {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 8px;
-      background-color: #00c6ff;
-      color: white;
-      cursor: pointer;
-    }
-
     ul { list-style: none; padding: 0; }
 
     li {
       background: rgba(255,255,255,0.1);
       margin: 10px;
-      padding: 10px;
+      padding: 12px;
       border-radius: 10px;
+      transition: 0.2s;
     }
 
-    a { color: #00eaff; text-decoration: none; font-weight: bold; }
+    li:hover {
+      transform: scale(1.03);
+      background: rgba(255,255,255,0.2);
+    }
+
+    a {
+      color: #00eaff;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 18px;
+    }
   </style>
 </head>
 <body>
 
-<h1>🌐 I miei link (online)</h1>
+<h1>🔗 I miei link personali</h1>
 
 <div class="container">
-  <input type="text" id="linkName" placeholder="Nome sito">
-  <input type="text" id="linkURL" placeholder="https://...">
-  <br>
-  <button onclick="addLink()">Aggiungi</button>
+  <ul>
+    <!-- 🔴 AGGIUNGI QUI I TUOI LINK -->
 
-  <ul id="linkList"></ul>
+    <li><a href="https://chat.openai.com" target="_blank">ChatGPT</a></li>
+    <li><a href="https://gemini.google.com" target="_blank">Gemini</a></li>
+    <li><a href="https://claude.ai" target="_blank">Claude</a></li>
+    <li><a href="https://www.deepseek.com" target="_blank">DeepSeek</a></li>
+
+    <!-- ESEMPIO: -->
+    <!-- <li><a href="https://sito.com" target="_blank">Nome sito</a></li> -->
+
+  </ul>
 </div>
-
-<script>
-  // 🔴 METTI QUI I TUOI DATI FIREBASE
-  const firebaseConfig = {
-    apiKey: "INSERISCI_API_KEY",
-    authDomain: "INSERISCI_AUTH_DOMAIN",
-    projectId: "INSERISCI_PROJECT_ID",
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
-  function addLink() {
-    const name = document.getElementById("linkName").value;
-    const url = document.getElementById("linkURL").value;
-
-    if (!name || !url) return alert("Compila tutto");
-
-    db.collection("links").add({ name, url });
-
-    document.getElementById("linkName").value = "";
-    document.getElementById("linkURL").value = "";
-  }
-
-  function loadLinks() {
-    db.collection("links").onSnapshot(snapshot => {
-      const list = document.getElementById("linkList");
-      list.innerHTML = "";
-
-      snapshot.forEach(doc => {
-        const data = doc.data();
-
-        const li = document.createElement("li");
-        const a = document.createElement("a");
-
-        a.href = data.url;
-        a.textContent = data.name;
-        a.target = "_blank";
-
-        li.appendChild(a);
-        list.appendChild(li);
-      });
-    });
-  }
-
-  loadLinks();
-</script>
 
 </body>
 </html>
