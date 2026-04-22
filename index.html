@@ -2,7 +2,12 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>I miei link</title>
+  <title>I miei link online</title>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,9 +18,7 @@
       text-align: center;
     }
 
-    h1 {
-      margin-top: 30px;
-    }
+    h1 { margin-top: 30px; }
 
     .container {
       background: rgba(0,0,0,0.3);
@@ -41,17 +44,9 @@
       background-color: #00c6ff;
       color: white;
       cursor: pointer;
-      transition: 0.3s;
     }
 
-    button:hover {
-      background-color: #0072ff;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-    }
+    ul { list-style: none; padding: 0; }
 
     li {
       background: rgba(255,255,255,0.1);
@@ -60,76 +55,68 @@
       border-radius: 10px;
     }
 
-    a {
-      color: #00eaff;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
+    a { color: #00eaff; text-decoration: none; font-weight: bold; }
   </style>
 </head>
 <body>
 
-  <h1>🔗 I miei link personali</h1>
+<h1>🌐 I miei link (online)</h1>
 
-  <div class="container">
-    <input type="text" id="linkName" placeholder="Nome del sito">
-    <input type="text" id="linkURL" placeholder="https://...">
-    <br>
-    <button onclick="addLink()">Aggiungi link</button>
+<div class="container">
+  <input type="text" id="linkName" placeholder="Nome sito">
+  <input type="text" id="linkURL" placeholder="https://...">
+  <br>
+  <button onclick="addLink()">Aggiungi</button>
 
-    <ul id="linkList"></ul>
-  </div>
+  <ul id="linkList"></ul>
+</div>
 
-  <script>
-    function addLink() {
-      const name = document.getElementById("linkName").value;
-      const url = document.getElementById("linkURL").value;
+<script>
+  // 🔴 METTI QUI I TUOI DATI FIREBASE
+  const firebaseConfig = {
+    apiKey: "INSERISCI_API_KEY",
+    authDomain: "INSERISCI_AUTH_DOMAIN",
+    projectId: "INSERISCI_PROJECT_ID",
+  };
 
-      if (name === "" || url === "") {
-        alert("Compila entrambi i campi!");
-        return;
-      }
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-      const li = document.createElement("li");
-      const a = document.createElement("a");
+  function addLink() {
+    const name = document.getElementById("linkName").value;
+    const url = document.getElementById("linkURL").value;
 
-      a.href = url;
-      a.textContent = name;
-      a.target = "_blank";
+    if (!name || !url) return alert("Compila tutto");
 
-      li.appendChild(a);
-      document.getElementById("linkList").appendChild(li);
+    db.collection("links").add({ name, url });
 
-      // Salvataggio in localStorage
-      const links = JSON.parse(localStorage.getItem("links")) || [];
-      links.push({ name, url });
-      localStorage.setItem("links", JSON.stringify(links));
+    document.getElementById("linkName").value = "";
+    document.getElementById("linkURL").value = "";
+  }
 
-      document.getElementById("linkName").value = "";
-      document.getElementById("linkURL").value = "";
-    }
+  function loadLinks() {
+    db.collection("links").onSnapshot(snapshot => {
+      const list = document.getElementById("linkList");
+      list.innerHTML = "";
 
-    function loadLinks() {
-      const links = JSON.parse(localStorage.getItem("links")) || [];
-      links.forEach(link => {
+      snapshot.forEach(doc => {
+        const data = doc.data();
+
         const li = document.createElement("li");
         const a = document.createElement("a");
 
-        a.href = link.url;
-        a.textContent = link.name;
+        a.href = data.url;
+        a.textContent = data.name;
         a.target = "_blank";
 
         li.appendChild(a);
-        document.getElementById("linkList").appendChild(li);
+        list.appendChild(li);
       });
-    }
+    });
+  }
 
-    window.onload = loadLinks;
-  </script>
+  loadLinks();
+</script>
 
 </body>
 </html>
